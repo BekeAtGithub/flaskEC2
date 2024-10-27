@@ -1,0 +1,15 @@
+# docker-compose.yml
+version: "3"
+services:
+  node01:
+    build: .
+    environment:
+      - INSTANCE_NUMBER=01
+    ports:
+      - "5001:5000"
+  node02:
+    build: .
+    environment:
+      - INSTANCE_NUMBER=02
+    ports:
+      - "5002:5000"
