@@ -23,3 +23,5 @@ Terraform plan job
 Terraform apply job 
 in addition to workflows stating the init and plan stages
 CircleCI project settings -> environment variables setup for AWS integration
+
+![alt text](https://github.com/BekeAtGithub/flaskEC2/blob/master/FlaskEC2.drawio.png)
