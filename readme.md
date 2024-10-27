@@ -23,3 +23,5 @@ Terraform plan job
 Terraform apply job 
 in addition to workflows stating the init and plan stages
 CircleCI project settings -> environment variables setup for AWS integration
+
+![alt text]([http://url/to/img.png](https://drive.google.com/file/d/1esG6vWOLihqFSR665fU_yefS-5IAmuco/view?usp=sharing))
