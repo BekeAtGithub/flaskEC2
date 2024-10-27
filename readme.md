@@ -3,11 +3,16 @@ templates/index.html prints the hostname and version onto the screen
 The Dockerfile specifies the metadata of the app, files, networking, environment
 Docker-Compose launches multiple instances of the application for High Availability
 
-Can deploy locally with:
+Can deploy locally with: 
+
 docker-compose build
+
 docker-compose up
+
 Access each instance in web browser:
+
 Node-01 = http://localhost:5001
+
 Node-02 = http://localhost:5002
 
 Can deploy with Terraform to AWS with: 
