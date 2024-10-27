@@ -9,13 +9,63 @@ variable "instance_count" {
   default = 2  # Number of EC2 instances to deploy
 }
 
-# Create a security group to allow HTTP access
+# Create a custom VPC
+resource "aws_vpc" "custom_vpc" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_support   = true
+  enable_dns_hostnames = true
+  tags = {
+    Name = "CustomVPC"
+  }
+}
+
+# Create a custom subnet within the VPC
+resource "aws_subnet" "custom_subnet" {
+  vpc_id                  = aws_vpc.custom_vpc.id
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = "us-east-1a"  # Update for your region
+  map_public_ip_on_launch = true
+  tags = {
+    Name = "CustomSubnet"
+  }
+}
+
+# Create an Internet Gateway for the custom VPC
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.custom_vpc.id
+  tags = {
+    Name = "CustomIGW"
+  }
+}
+
+# Create a route table for the VPC and add a route to the Internet Gateway
+resource "aws_route_table" "custom_route_table" {
+  vpc_id = aws_vpc.custom_vpc.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.igw.id
+  }
+
+  tags = {
+    Name = "CustomRouteTable"
+  }
+}
+
+# Associate the route table with the subnet
+resource "aws_route_table_association" "rta" {
+  subnet_id      = aws_subnet.custom_subnet.id
+  route_table_id = aws_route_table.custom_route_table.id
+}
+
+# Create a security group to allow HTTP access on port 5000
 resource "aws_security_group" "app_sg" {
+  vpc_id      = aws_vpc.custom_vpc.id
   name        = "app_security_group"
   description = "Allow HTTP inbound traffic"
 
   ingress {
-    description = "HTTP access"
+    description = "Allow HTTP access"
     from_port   = 5000
     to_port     = 5000
     protocol    = "tcp"
@@ -29,24 +79,37 @@ resource "aws_security_group" "app_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    Name = "AppSecurityGroup"
+  }
 }
 
-# Launch EC2 instances
-resource "aws_instance" "app_instance" {
-  count         = var.instance_count
-  ami           = "ami-0230bd60aa48260c6"  # Amazon Linux 2 AMI
-  instance_type = "t2.micro"
-  security_groups = [aws_security_group.app_sg.name]
+# Find the latest Amazon Linux 2 AMI
+data "aws_ami" "amazon_linux" {
+  most_recent = true
+  owners      = ["amazon"]
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+  }
+}
 
-  # User data script to install Docker, run Flask app
+# Launch EC2 instances in the custom subnet with the security group
+resource "aws_instance" "app_instance" {
+  count              = var.instance_count
+  ami                = data.aws_ami.amazon_linux.id
+  instance_type      = "t2.micro"
+  subnet_id          = aws_subnet.custom_subnet.id
+  vpc_security_group_ids = [aws_security_group.app_sg.id]  # Use security group ID here
+
+  # User data script to install Docker and run Flask app
   user_data = <<-EOF
               #!/bin/bash
-              # Install Docker
               amazon-linux-extras install docker -y
               service docker start
               usermod -a -G docker ec2-user
-              
-              # Pull and run Docker container with INSTANCE_NUMBER
+
               INSTANCE_NUMBER=$(printf "%02d" $((${count.index} + 1)))
               docker run -d -e INSTANCE_NUMBER=$INSTANCE_NUMBER -p 5000:5000 <your_docker_image>
               EOF
@@ -56,7 +119,7 @@ resource "aws_instance" "app_instance" {
   }
 }
 
-# Output instance information
+# Output the public IP addresses of instances
 output "instance_ips" {
   value = [for instance in aws_instance.app_instance : instance.public_ip]
 }
