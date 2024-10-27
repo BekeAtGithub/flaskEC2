@@ -24,24 +24,24 @@ Node-02 = http://localhost:5002
 # Can deploy with Terraform to AWS by first pushing the docker image to ECR
 
 *Build Docker image locally:
-docker build -t <nameyourimage>>:latest .
+docker build -t 'nameyourimage':latest .
 
 
 *Authenticate Docker to ECR with:
 
-aws ecr get-login-password --region <aws-region> | docker login --username AWS --password-stdin <aws-account-id>.dkr.ecr.<aws-region>.amazonaws.com
+aws ecr get-login-password --region 'aws-region' | docker login --username AWS --password-stdin 'aws-account-id'.dkr.ecr.'aws-region'.amazonaws.com
 
 *Create the ECR repo
 
-aws ecr create-repository --repository-name <repository-name> --region <aws-region>
+aws ecr create-repository --repository-name 'repository-name' --region 'aws-region'
 
 *Tag the Docker image
 
-docker tag <imagename>:latest <aws-account-id>.dkr.ecr.<aws-region>.amazonaws.com/<imagename>:latest
+docker tag 'imagename':latest 'aws-account-id'.dkr.ecr.'aws-region'.amazonaws.com/'imagename':latest
 
 *Push the Image to ECR
 
-docker push <aws-account-id>.dkr.ecr.<aws-region>.amazonaws.com/<imagename>:latest
+docker push 'aws-account-id'.dkr.ecr.'aws-region'.amazonaws.com/'imagename':latest
 
 terraform init
 
