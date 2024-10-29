@@ -1,4 +1,4 @@
-# Simple Python web app, uses Flask as the web server 
+# Simple Python web app, uses Flask as the web server  
 
 templates/index.html prints the hostname and version onto the screen
 
