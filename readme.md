@@ -2,7 +2,7 @@
 
 templates/index.html prints the hostname and version onto the screen
 
-The Dockerfile specifies the metadata of the app, files, networking, environment
+The Dockerfile specifies the metadata of the app, files, networking, environment 
 
 Docker-Compose launches multiple instances of the application for High Availability
 
