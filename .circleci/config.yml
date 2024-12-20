@@ -3,7 +3,7 @@
 # 
 #executors:
 #  terraform-executor:
-#    docker:
+#    docker: 
 #      - image: hashicorp/terraform:1.0.0  # Update to latest Terraform version as needed
 #    working_directory: ~/repo
 #
