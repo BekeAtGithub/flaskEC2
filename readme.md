@@ -8,7 +8,7 @@ Docker-Compose launches multiple instances of the application for High Availabil
 
 
 
-# Can deploy locally with
+# Can deploy locally with 
 
 docker-compose build
 
